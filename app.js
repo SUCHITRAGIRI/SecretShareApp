@@ -63,22 +63,20 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
         const username = req.body.username;
-        const password = hash;
+        const password = req.body.password;
         User.findOne({ email: username }, (err, foundUser) => {
             if (err) {
                 console.log(err);
             } else {
-                if (foundUser) {
-                    if (foundUser.password === password) {
-                        res.render("secrets");
-                    }
+                bcrypt.compare(password, foundUser.password, function(err, result) {
+                    if(result == true)res.render("secrets");
+                });
+                   
                 }
-            }
         });
     });
-});
+
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
